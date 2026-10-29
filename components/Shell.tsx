@@ -29,7 +29,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSessie(data.session));
     const { data } = supabase.auth.onAuthStateChange((_e, s) => setSessie(s));
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/sw.js`).catch(() => {});
     const tel = () => setWachtend(wachtrij().length);
     const online = () => { setOffline(!navigator.onLine); verstuurWachtrij().then(setWachtend); };
     tel(); online();

@@ -1,0 +1,36 @@
+# Bouwt de app bij elke wijziging op main en zet ze op GitHub Pages (branch gh-pages).
+name: Online zetten
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bouwen:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_BASE_PATH: /koelmiddel-logboek
+      # Openbare waarden: de database is beschermd door de toegangsregels in Supabase.
+      NEXT_PUBLIC_SUPABASE_URL: https://dyyhyysqbssectczlvcx.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5eWh5eXNxYnNzZWN0Y3psdmN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MTEzNTMsImV4cCI6MjEwODA4NzM1M30.fCdndwHfs5VgetaehqqFWtuD9_64ypIh3o86FIYPsDQ
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Naar gh-pages
+        run: |
+          cd out
+          touch .nojekyll
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -q -m "App ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
