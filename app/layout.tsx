@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const BASIS = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 export const metadata: Metadata = {
   title: "Koelmiddellogboek",
   description: "Koelmiddelboekhouding en F-gassenlogboek van AR Airco",
-  manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg", apple: "/icon-192.png" },
+  manifest: `${BASIS}/manifest.webmanifest`,
+  icons: { icon: `${BASIS}/icon.svg`, apple: `${BASIS}/icon-192.png` },
   appleWebApp: { capable: true, title: "Logboek", statusBarStyle: "default" },
 };
 

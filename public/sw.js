@@ -1,9 +1,11 @@
 // Service worker: houdt de app-bestanden bij zodat het logboek ook zonder bereik opent.
 // Pagina's: eerst netwerk, anders de bewaarde versie. Gegevens van Supabase gaan nooit via deze cache.
-const CACHE = "logboek-v1";
+const CACHE = "logboek-v2";
+// Paden relatief aan de plek waar de app staat (de root, of een submap op GitHub Pages).
+const pad = (p) => new URL(p, self.registration.scope).href;
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/lektesten/", "/flessen/", "/jaaroverzicht/", "/klanten/", "/installatie/", "/installatie/nieuw/", "/interventie/", "/flessen/nieuw/", "/login/"])));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["./", "lektesten/", "flessen/", "jaaroverzicht/", "klanten/", "installatie/", "installatie/nieuw/", "interventie/", "flessen/nieuw/", "login/"].map(pad))));
   self.skipWaiting();
 });
 
@@ -18,6 +20,6 @@ self.addEventListener("fetch", (e) => {
   e.respondWith(
     fetch(e.request)
       .then((res) => { const kopie = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, kopie)); return res; })
-      .catch(() => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match("/")))
+      .catch(() => caches.match(e.request, { ignoreSearch: true }).then((r) => r || caches.match(pad("./"))))
   );
 });
